@@ -1,11 +1,12 @@
 import requests
 import json
 from time import sleep, time
+import os
 
 #TODO: Document how to get job.id and repository.id
 
 # you can find your travis api token in your profile
-TRAVIS_API_TOKEN="CRT9gydfIwwKHMH-wHAKSw"
+TRAVIS_API_TOKEN=os.environ['TRAVIS_API_TOKEN']
 GITHUB_USERNAME="anup-kodlekere"
 # repo where the travis build is taking place
 GITHUB_REPOSITORY_NAME="travis-sample-job"
