@@ -55,7 +55,6 @@ build_number = response.json()["builds"][0]["id"]
 
 print("Starting the polllll.....")
 
-# Poll till specified in TIME_LIMIT variable
 start = time()
 flag = False
 
@@ -66,7 +65,7 @@ print("Waiting for all jobs to finish")
 #state = requests.get("https://api.travis-ci.com/build/"+str(build_number), headers=headers).json()["state"]
 state = "queued"
 while(state != "passed" and state != "failed"):
-   sleep(10)
+   sleep(30)
    state = requests.get("https://api.travis-ci.com/build/"+str(build_number), headers=headers).json()["state"]
 
 flag = True
