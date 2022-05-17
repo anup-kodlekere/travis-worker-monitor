@@ -75,9 +75,9 @@ if state=="errored":
 flag = True
 print("All jobs have finished")
 
-started_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["started_at"]
-finished_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["finished_at"]
-duration = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["duration"]
+build_started_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["started_at"]
+build_finished_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["finished_at"]
+build_duration = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["duration"]
 
 # collect all job-ids in the build
 response = requests.get("https://api.travis-ci.com/build/" + str(build_id) + "/jobs", headers=headers)
@@ -93,18 +93,25 @@ for obj in job_ids_jobj:
 dep_file = open("deploy_info.log", "a")
 
 for id in jids:
+   endpoint = "https://api.travis-ci.com/job/" + str(id) + "/log"
+   response = requests.get(endpoint, headers=log_headers)
+   logs = response.text
+
+   endpoint = "https://api.travis-ci.com/job/" + str(id)
+   response = requests.get(endpoint, headers=headers)
+
+   job_started_at = response.json()["started_at"]
+   jobs_duration = response.json()["duration"]
+
    dep_file.write("Logs for Job \n")
    dep_file.write("{}".format(id))
    dep_file.write("\n")
 
    dep_file.write("Started At: \n")
-   dep_file.write("{}".format(started_at))
+   dep_file.write("{}".format(job_started_at))
    dep_file.write("\n")
 
-
-   endpoint = "https://api.travis-ci.com/job/" + str(id) + "/log"
-   response = requests.get(endpoint, headers=log_headers)
-   dep_file.write(response.text)
+   dep_file.write(logs)
 
 dep_file.close()
 
