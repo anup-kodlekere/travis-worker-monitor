@@ -51,7 +51,7 @@ sleep(10)
 response = requests.get("https://api.travis-ci.com/repo/" + str(REPOSITORY_ID) + "/request/"+ str(request_no),headers=headers)
 sleep(1)
 # Get the build number from the request number
-build_number = response.json()["builds"][0]["id"]
+build_id = response.json()["builds"][0]["id"]
 
 print("Starting the polllll.....")
 
@@ -64,9 +64,9 @@ flag = False
 print("Waiting for all jobs to finish")
 #state = requests.get("https://api.travis-ci.com/build/"+str(build_number), headers=headers).json()["state"]
 state = "queued"
-while(state != "passed" and state != "failed"):
+while(state != "passed" and state != "failed" and state != "errored"):
    sleep(30)
-   state = requests.get("https://api.travis-ci.com/build/"+str(build_number), headers=headers).json()["state"]
+   state = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["state"]
 
 if state=="errored":
    print("Travis build errored, cannot proceed further")
@@ -75,9 +75,12 @@ if state=="errored":
 flag = True
 print("All jobs have finished")
 
-# collect all job-ids in the build
+started_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["started_at"]
+finished_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["finished_at"]
+duration = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["duration"]
 
-response = requests.get("https://api.travis-ci.com/build/" + str(build_number) + "/jobs", headers=headers)
+# collect all job-ids in the build
+response = requests.get("https://api.travis-ci.com/build/" + str(build_id) + "/jobs", headers=headers)
 job_ids_jobj = response.json()["jobs"][0:]
 
 jids = []
@@ -93,7 +96,12 @@ for id in jids:
    dep_file.write("Logs for Job \n")
    dep_file.write("{}".format(id))
    dep_file.write("\n")
-   
+
+   dep_file.write("Started At: \n")
+   dep_file.write("{}".format(started_at))
+   dep_file.write("\n")
+
+
    endpoint = "https://api.travis-ci.com/job/" + str(id) + "/log"
    response = requests.get(endpoint, headers=log_headers)
    dep_file.write(response.text)
@@ -103,7 +111,7 @@ dep_file.close()
 # If build didn't start
 if not flag:
    try:
-      response = requests.post("https://api.travis-ci.com/build/" + str(build_number) + "/cancel", headers=headers)
+      response = requests.post("https://api.travis-ci.com/build/" + str(build_id) + "/cancel", headers=headers)
       print("Time limit exceeded, Build Cancelled!")
    except Exception as e:
       print("Error while canceliing the build")
