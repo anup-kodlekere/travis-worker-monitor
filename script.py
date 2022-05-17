@@ -71,7 +71,7 @@ while(state != "passed" and state != "failed"):
 if state=="errored":
    print("Travis build errored, cannot proceed further")
    exit()
-   
+
 flag = True
 print("All jobs have finished")
 
@@ -90,7 +90,10 @@ for obj in job_ids_jobj:
 dep_file = open("deploy_info.log", "a")
 
 for id in jids:
-   dep_file.write("Logs for Job : {}".format(id))
+   dep_file.write("Logs for Job \n")
+   dep_file.write("{}".format(id))
+   dep_file.write("\n")
+   
    endpoint = "https://api.travis-ci.com/job/" + str(id) + "/log"
    response = requests.get(endpoint, headers=log_headers)
    dep_file.write(response.text)
