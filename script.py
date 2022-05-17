@@ -46,7 +46,7 @@ request_no = data["request"]["id"]
 
 # Get the response body
 # Make a request to get the build numbers wait some time to spin up the build
-sleep(2)
+sleep(10)
 
 response = requests.get("https://api.travis-ci.com/repo/" + str(REPOSITORY_ID) + "/request/"+ str(request_no),headers=headers)
 sleep(1)
