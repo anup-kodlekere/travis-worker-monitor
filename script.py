@@ -101,7 +101,6 @@ for id in jids:
    response = requests.get(endpoint, headers=headers)
 
    job_started_at = response.json()["started_at"]
-   jobs_duration = response.json()["duration"]
 
    dep_file.write("Logs for Job \n")
    dep_file.write("{}".format(id))
