@@ -68,6 +68,10 @@ while(state != "passed" and state != "failed"):
    sleep(30)
    state = requests.get("https://api.travis-ci.com/build/"+str(build_number), headers=headers).json()["state"]
 
+if state=="errored":
+   print("Travis build errored, cannot proceed further")
+   exit()
+   
 flag = True
 print("All jobs have finished")
 
