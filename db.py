@@ -62,18 +62,17 @@ def insert():
     )
 
     tunnel.start()
+    print("[LOG]: SSH connection established")
     #establishing the connection
     conn = psycopg2.connect(
         database="worker_usage", user='postgres', password='76482687', host=tunnel.local_bind_host, port=tunnel.local_bind_port
     )
 
+    print("[LOG]: Connected to remote postgres db")
     #Creating a cursor object using the cursor() method
     cursor = conn.cursor()
 
     tbl_row = parse_log_input()
-
-    #orig = "INSERT INTO usage_details values(570271173,  'anup-kodlekere/check', 'lxd-ppc64le-travis-ci-production-worker1-com', 4, 'passed', '2022-05-16', '2022-05-16', '14:59:17');"
-    #print(orig)
 
     for i in range(len(tbl_row[0])):
         ids = str(tbl_row[0][i])
@@ -98,6 +97,9 @@ def insert():
     print(data)
 
     conn.close()
+
+    print("[LOG]: DB Connection closed")
     tunnel.stop()
+    print("[LOG]: SSH Connection closed")
 
 insert()
