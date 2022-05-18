@@ -75,7 +75,7 @@ def insert():
     #orig = "INSERT INTO usage_details values(570271173,  'anup-kodlekere/check', 'lxd-ppc64le-travis-ci-production-worker1-com', 4, 'passed', '2022-05-16', '2022-05-16', '14:59:17');"
     #print(orig)
 
-    for i in range(2):
+    for i in range(len(tbl_row[0])):
         ids = str(tbl_row[0][i])
         rep = str(tbl_row[1][i])
         wrkr = str(tbl_row[2][i])
