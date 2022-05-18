@@ -72,6 +72,8 @@ if state=="errored":
    print("Travis build errored, cannot proceed further")
    exit()
 
+sleep(120)
+
 flag = True
 print("All jobs have finished")
 
