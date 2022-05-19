@@ -37,7 +37,7 @@ body={
 
 def write_passed_log(job_id, job_queue_waiting_time):
    dep_file = open("deploy_info.log", "a")
-   endpoint = "https://api.travis-ci.com/job/" + str(job_id) + "/log"
+   endpoint = "https://api.travis-ci.com/job/" + str(job_id) + "/log.txt"
    response = requests.get(endpoint, headers=log_headers)
    logs = response.text
 
