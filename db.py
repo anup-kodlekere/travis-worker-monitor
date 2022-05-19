@@ -48,6 +48,8 @@ def parse_log_input():
         jid = int(lines[0])
         queue_wait_time = int(lines[1])
         job_state = lines[2]
+        today = date.today()
+        repo = 'anup-kodlekere/travis-sample-job'
 
         if job_state == 'queued':
             insert(jid, repo, 'NULL', queue_wait_time, 'NULL', today, 'NULL', job_state)
@@ -55,8 +57,6 @@ def parse_log_input():
             job_started_at = lines[3].split('T', 1)[1][:-1]
             worker_name = lines[6].split('.', 1)[1]
             job_bootup = lines[9].split(':', 1)[1]
-            today = date.today()
-            repo = 'anup-kodlekere/travis-sample-job'
 
             worker_bootup = 0
             minute_j1 = job_bootup.find('m')
