@@ -49,9 +49,6 @@ def write_passed_log(job_id, job_queue_waiting_time):
    dep_file.write("{}".format(job_id))
    dep_file.write("\n")
 
-   dep_file.write(logs)
-   dep_file.write("\n")
-
    dep_file.write("{}".format(job_started_at))
    dep_file.write("\n")
    
@@ -59,6 +56,9 @@ def write_passed_log(job_id, job_queue_waiting_time):
    dep_file.write("\n")
 
    dep_file.write("passed")
+   
+   dep_file.write(logs)
+   dep_file.write("\n")
 
    dep_file.close()
 
@@ -68,15 +68,14 @@ def write_failure_log(job_id, job_queue_waiting_time):
    dep_file.write("{}".format(job_id))
    dep_file.write("\n")
 
-   for _ in range(6):
-      dep_file.write('NULL')
-      dep_file.write('\n')
-
-
    dep_file.write("{}".format(job_queue_waiting_time))
    dep_file.write("\n")
 
    dep_file.write("failed")
+   
+   for _ in range(6):
+      dep_file.write('NULL')
+      dep_file.write('\n')
 
    dep_file.close()
 
