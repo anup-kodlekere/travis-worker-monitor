@@ -37,11 +37,11 @@ body={
 
 def write_passed_log(job_id, job_queue_waiting_time):
    dep_file = open("deploy_info.log", "a")
-   endpoint = "https://api.travis-ci.com/job/" + str(id) + "/log"
+   endpoint = "https://api.travis-ci.com/job/" + str(job_id) + "/log"
    response = requests.get(endpoint, headers=log_headers)
    logs = response.text
 
-   endpoint = "https://api.travis-ci.com/job/" + str(id)
+   endpoint = "https://api.travis-ci.com/job/" + str(job_id)
    response = requests.get(endpoint, headers=headers)
 
    job_started_at = response.json()["started_at"]
@@ -136,7 +136,7 @@ if build_state =="errored":
    print("Travis build errored, cannot proceed further")
    exit()
 
-sleep(120)
+sleep(60)
 
 print("All jobs have finished")
 
