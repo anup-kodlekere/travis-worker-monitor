@@ -81,6 +81,7 @@ def write_failure_log(job_id, job_queue_waiting_time):
    dep_file.close()
 
 build_request_made = datetime.now()
+print("[LOG]: Build request made at {}".format(build_request_made))
 request_made_hour = build_request_made.hour
 request_made_min = build_request_made.minute
 
