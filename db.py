@@ -71,3 +71,5 @@ def parse_log_input():
             insert()
 
     deploy.close(jid, repo, worker_name, queue_wait_time, worker_bootup, today, job_started_at, job_state)
+
+parse_log_input()
