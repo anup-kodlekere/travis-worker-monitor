@@ -1,6 +1,5 @@
 import psycopg2
-from datetime import date, time
-import os
+from datetime import date
 
 def insert(ids, rep, wrkr, qwt, bttm, dt, tm, st):
 
