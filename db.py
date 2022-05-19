@@ -2,40 +2,7 @@ import psycopg2
 from datetime import date, time
 import os
 
-def parse_log_input():
-
-    today = date.today()
-
-    repo = 'anup-kodlekere/travis-sample-job'
-
-    with open("raw_db_input") as deploy:
-        lines = deploy.readlines()
-        lines = [line.rstrip() for line in lines]
-
-        jid = int(lines[0])
-        queue_wait_time = int(lines[1])
-        job_state = lines[2]
-        job_started_at = lines[3].split('T', 1)[1][:-1]
-        worker_name = lines[6].split('.', 1)[1]
-        job_bootup = lines[9].split(':', 1)[1]
-
-        worker_bootup = 0
-
-        minute_j1 = job_bootup.find('m')
-
-        if minute_j1 != -1:
-            m = int(job_bootup[1:minute_j1])
-            s = round(float(job_bootup[minute_j1+1:-1]))
-            worker_bootup = m * 60 + s
-        else:
-            j1s = round(float(job_bootup[1:-1]))
-            worker_bootup = j1s
-
-    deploy.close()
-
-    return jid, repo, worker_name, queue_wait_time, worker_bootup, today, job_started_at, job_state
-
-def insert():
+def insert(ids, rep, wrkr, qwt, bttm, dt, tm, st):
 
     #establishing the connection
     conn = psycopg2.connect(
@@ -46,16 +13,14 @@ def insert():
     #Creating a cursor object using the cursor() method
     cursor = conn.cursor()
 
-    tbl_row = parse_log_input()
-
-    ids = str(tbl_row[0])
-    rep = str(tbl_row[1])
-    wrkr = str(tbl_row[2])
-    qwt = str(tbl_row[3])
-    bttm = str(tbl_row[4])
-    dt = str(tbl_row[5])
-    tm = str(tbl_row[6])
-    st = str(tbl_row[7])
+    ids = str(ids)
+    rep = str(rep)
+    wrkr = str(wrkr)
+    qwt = str(qwt)
+    bttm = str(bttm)
+    dt = str(dt)
+    tm = str(tm)
+    st = str(st)
 
     query = "INSERT INTO lxd_usage_details values(" + ids + ", '" + rep + "', '" + wrkr + "'," + qwt + "," + bttm + ", '" + dt + "', '" + dt + "', '" + tm + "', '" + st + "');"
 
@@ -74,4 +39,35 @@ def insert():
 
     print("[LOG]: DB Connection closed")
 
-insert()
+def parse_log_input():
+
+    with open("raw_db_input") as deploy:
+        lines = deploy.readlines()
+        lines = [line.rstrip() for line in lines]
+
+        jid = int(lines[0])
+        queue_wait_time = int(lines[1])
+        job_state = lines[2]
+
+        if job_state == 'queued':
+            insert(jid, queue_wait_time, job_state, 'NULL', 'NULL', 'NULL', 'NULL', 'NULL', 'NULL')
+        else:
+            job_started_at = lines[3].split('T', 1)[1][:-1]
+            worker_name = lines[6].split('.', 1)[1]
+            job_bootup = lines[9].split(':', 1)[1]
+            today = date.today()
+            repo = 'anup-kodlekere/travis-sample-job'
+
+            worker_bootup = 0
+            minute_j1 = job_bootup.find('m')
+            if minute_j1 != -1:
+                m = int(job_bootup[1:minute_j1])
+                s = round(float(job_bootup[minute_j1+1:-1]))
+                worker_bootup = m * 60 + s
+            else:
+                j1s = round(float(job_bootup[1:-1]))
+                worker_bootup = j1s
+
+            insert()
+
+    deploy.close(jid, repo, worker_name, queue_wait_time, worker_bootup, today, job_started_at, job_state)
