@@ -43,7 +43,7 @@ def parse_log_input():
     with open("raw_db_input") as deploy:
         lines = deploy.readlines()
         lines = [line.rstrip() for line in lines]
-
+        print(lines)
         jid = int(lines[0])
         queue_wait_time = int(lines[1])
         job_state = lines[2]
