@@ -49,13 +49,14 @@ def write_passed_log(job_id, job_queue_waiting_time):
    dep_file.write("{}".format(job_id))
    dep_file.write("\n")
 
-   dep_file.write("{}".format(job_started_at))
-   dep_file.write("\n")
-   
    dep_file.write("{}".format(job_queue_waiting_time))
    dep_file.write("\n")
 
    dep_file.write("passed")
+   dep_file.write("\n")
+
+   dep_file.write("{}".format(job_started_at))
+   dep_file.write("\n")
    
    dep_file.write(logs)
    dep_file.write("\n")
