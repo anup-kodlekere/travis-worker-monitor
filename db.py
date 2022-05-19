@@ -22,7 +22,10 @@ def insert(ids, rep, wrkr, qwt, bttm, dt, tm, st):
     tm = str(tm)
     st = str(st)
 
-    query = "INSERT INTO lxd_usage_details values(" + ids + ", '" + rep + "', '" + wrkr + "'," + qwt + "," + bttm + ", '" + dt + "', '" + dt + "', '" + tm + "', '" + st + "');"
+    if st == 'passed':
+        query = "INSERT INTO lxd_usage_details values(" + ids + ", '" + rep + "', '" + wrkr + "'," + qwt + "," + bttm + ", '" + dt + "', '" + dt + "', '" + tm + "', '" + st + "');"
+    else:
+        query = "INSERT INTO lxd_usage_details(job_id, repo, queue_wait_time_m, logged_after, logged_before, job_state) values(" + ids + ", '" + rep + "', " + qwt + ", '" + dt + "', '" + dt + "', '" + st + "');"
 
     print(query)
     cursor.execute(query)
