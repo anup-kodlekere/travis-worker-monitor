@@ -125,6 +125,7 @@ while(build_state != "passed" and build_state != "failed" and build_state != "er
    qwt_m = queue_wait_time.minute
 
    wait_time = (qwt_h - request_made_hour) * 60 + (qwt_m - request_made_min)
+   queue_wait_time = wait_time
 
    if job_state == "queued" and wait_time >= 60:
       print("[LOG]: Job waiting in queue for over an hour.")
@@ -136,7 +137,7 @@ if build_state =="errored":
    print("Travis build errored, cannot proceed further")
    exit()
 
-sleep(60)
+sleep(180)
 
 print("All jobs have finished")
 

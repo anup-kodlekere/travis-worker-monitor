@@ -7,49 +7,35 @@ def parse_log_input():
     today = date.today()
 
     repo = 'anup-kodlekere/travis-sample-job'
-    state = 'passed'
 
     with open("raw_db_input") as deploy:
         lines = deploy.readlines()
         lines = [line.rstrip() for line in lines]
 
-        j1_started_at = lines[3].split('T', 1)[1][:-1]
-        j2_started_at = lines[13].split('T', 1)[1][:-1]
+        job_started_at = lines[3].split('T', 1)[1][:-1]
 
-        jid = [int(lines[1]), int(lines[11])]
+        jid = int(lines[1])
 
-        worker_name = [lines[5].split('.', 1)[1], lines[15].split('.', 1)[1]]
+        worker_name = lines[5].split('.', 1)[1]
 
-        job1_bootup = lines[8].split(':', 1)[1]
-        job2_bootup = lines[18].split(':', 1)[1]
+        job_bootup = lines[8].split(':', 1)[1]
 
-        j1_triggered, j2_triggered = 0, 0
+        job_triggered = 0
 
-        minute_j1 = job1_bootup.find('m')
-        minute_j2 = job2_bootup.find('m')
+        minute_j1 = job_bootup.find('m')
 
         if minute_j1 != -1:
-            m = int(job1_bootup[1:minute_j1])
-            s = round(float(job1_bootup[minute_j1+1:-1]))
-            j1_triggered = m * 60 + s
+            m = int(job_bootup[1:minute_j1])
+            s = round(float(job_bootup[minute_j1+1:-1]))
+            job_triggered = m * 60 + s
         else:
-            j1s = round(float(job1_bootup[1:-1]))
-            j1_triggered = j1s
+            j1s = round(float(job_bootup[1:-1]))
+            job_triggered = j1s
 
-        if minute_j2 != -1:
-            m = int(job1_bootup[1:minute_j1])
-            s = round(float(job2_bootup[minute_j1+1:-1]))
-            j2_triggered = m * 60 + s
-        else :
-            j2s = round(float(job2_bootup[1:-1]))
-            j2_triggered = j2s
-
-        worker_bootup_time = [j1_triggered, j2_triggered]
-        job_started_at = [j1_started_at, j2_started_at]
 
     deploy.close()
 
-    return [jid, [repo,repo],  worker_name, worker_bootup_time, [state, state], [today, today], job_started_at]
+    return jid, repo,  worker_name, job_bootup, state, today, job_started_at
 
 def insert():
     #establishing the connection
