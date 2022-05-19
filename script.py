@@ -1,10 +1,10 @@
 import requests
 import json
-from time import sleep, time
+from time import sleep
+from datetime import datetime
 import os
 
 #TODO: Document how to get job.id and repository.id
-
 # you can find your travis api token in your profile
 TRAVIS_API_TOKEN=os.environ['TRAVIS_API_TOKEN']
 GITHUB_USERNAME="anup-kodlekere"
@@ -35,6 +35,54 @@ body={
   }
 }
 
+def write_passed_log(job_id, job_queue_waiting_time):
+   dep_file = open("deploy_info.log", "a")
+   endpoint = "https://api.travis-ci.com/job/" + str(id) + "/log"
+   response = requests.get(endpoint, headers=log_headers)
+   logs = response.text
+
+   endpoint = "https://api.travis-ci.com/job/" + str(id)
+   response = requests.get(endpoint, headers=headers)
+
+   job_started_at = response.json()["started_at"]
+
+   dep_file.write("{}".format(job_id))
+   dep_file.write("\n")
+
+   dep_file.write(logs)
+   dep_file.write("\n")
+
+   dep_file.write("{}".format(job_started_at))
+   dep_file.write("\n")
+   
+   dep_file.write("{}".format(job_queue_waiting_time))
+   dep_file.write("\n")
+
+   dep_file.write("passed")
+
+   dep_file.close()
+
+def write_failure_log(job_id, job_queue_waiting_time):
+   dep_file = open("deploy_info.log", "a")
+
+   dep_file.write("{}".format(job_id))
+   dep_file.write("\n")
+
+   for _ in range(6):
+      dep_file.write('NULL')
+      dep_file.write('\n')
+
+
+   dep_file.write("{}".format(job_queue_waiting_time))
+   dep_file.write("\n")
+
+   dep_file.write("failed")
+
+   dep_file.close()
+
+build_request_made = datetime.now()
+request_made_hour = build_request_made.hour
+request_made_min = build_request_made.minute
 
 # Make a build request
 response = requests.post("https://api.travis-ci.com/repo/"+ GITHUB_USERNAME + "%2F" + GITHUB_REPOSITORY_NAME + "/requests", data=json.dumps(body), headers=headers)
@@ -53,74 +101,47 @@ sleep(1)
 # Get the build number from the request number
 build_id = response.json()["builds"][0]["id"]
 
-print("Starting the polllll.....")
-
-start = time()
-flag = False
-
 # wait for the job to finish since sometimes the logs aren't streamed back
 # to travis-ui immediately
 
 print("Waiting for all jobs to finish")
-#state = requests.get("https://api.travis-ci.com/build/"+str(build_number), headers=headers).json()["state"]
-state = "queued"
-while(state != "passed" and state != "failed" and state != "errored"):
-   sleep(30)
-   state = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["state"]
 
-if state=="errored":
+orig = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()
+build_state = orig["state"]
+
+job_id = orig["jobs"][0]["id"]
+queue_wait_time = 0 # in minutes
+
+
+while(build_state != "passed" and build_state != "failed" and build_state != "errored"):
+   sleep(30)
+   build_state = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["state"]
+
+   # make a reuest to job and check if state is queued and time elsped is one hour,
+   # if true then exit the loop and send NULL data to db
+   job_state = requests.get("https://api.travis-ci.com/job/"+str(job_id), headers=headers).json()["state"]
+   queue_wait_time = datetime.now()
+   qwt_h = queue_wait_time.hour
+   qwt_m = queue_wait_time.minute
+
+   wait_time = (qwt_h - request_made_hour) * 60 + (qwt_m - request_made_min)
+
+   if job_state == "queued" and wait_time >= 60:
+      print("[LOG]: Job waiting in queue for over an hour.")
+      write_failure_log(job_id, 60)
+      exit()
+
+
+if build_state =="errored":
    print("Travis build errored, cannot proceed further")
    exit()
 
-sleep(300)
+sleep(120)
 
-flag = True
 print("All jobs have finished")
+
+write_passed_log(job_id, queue_wait_time)
 
 build_started_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["started_at"]
 build_finished_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["finished_at"]
 build_duration = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["duration"]
-
-# collect all job-ids in the build
-response = requests.get("https://api.travis-ci.com/build/" + str(build_id) + "/jobs", headers=headers)
-job_ids_jobj = response.json()["jobs"][0:]
-
-jids = []
-for obj in job_ids_jobj:
-   jids.append(obj["id"])
-
-
-# the worker startup data will be written to a file
-# TODO: Find ways to connect jenkins to a db to store this data there
-dep_file = open("deploy_info.log", "a")
-
-for id in jids:
-   endpoint = "https://api.travis-ci.com/job/" + str(id) + "/log"
-   response = requests.get(endpoint, headers=log_headers)
-   logs = response.text
-
-   endpoint = "https://api.travis-ci.com/job/" + str(id)
-   response = requests.get(endpoint, headers=headers)
-
-   job_started_at = response.json()["started_at"]
-
-   dep_file.write("Logs for Job \n")
-   dep_file.write("{}".format(id))
-   dep_file.write("\n")
-
-   dep_file.write("Started At: \n")
-   dep_file.write("{}".format(job_started_at))
-   dep_file.write("\n")
-
-   dep_file.write(logs)
-
-dep_file.close()
-
-# If build didn't start
-if not flag:
-   try:
-      response = requests.post("https://api.travis-ci.com/build/" + str(build_id) + "/cancel", headers=headers)
-      print("Time limit exceeded, Build Cancelled!")
-   except Exception as e:
-      print("Error while canceliing the build")
-      print(e)

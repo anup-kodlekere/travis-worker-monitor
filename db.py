@@ -1,4 +1,3 @@
-from sshtunnel import SSHTunnelForwarder
 import psycopg2
 from datetime import date, time
 import os
@@ -53,19 +52,9 @@ def parse_log_input():
     return [jid, [repo,repo],  worker_name, worker_bootup_time, [state, state], [today, today], job_started_at]
 
 def insert():
-    tunnel = SSHTunnelForwarder(
-        (os.environ['DB_IP'], 22),
-        ssh_username='root',
-        ssh_private_key='key',
-        remote_bind_address=('localhost', 6443),
-        local_bind_address=('localhost', 6443),
-    )
-
-    tunnel.start()
-    print("[LOG]: SSH connection established")
     #establishing the connection
     conn = psycopg2.connect(
-        database="worker_usage", user='postgres', password='76482687', host=tunnel.local_bind_host, port=tunnel.local_bind_port
+        database="worker_usage", user='postgres', password='76482687', host='169.48.22.246', port='6443'
     )
 
     print("[LOG]: Connected to remote postgres db")
