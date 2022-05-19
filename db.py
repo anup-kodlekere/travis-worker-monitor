@@ -50,7 +50,7 @@ def parse_log_input():
         job_state = lines[2]
 
         if job_state == 'queued':
-            insert(jid, queue_wait_time, job_state, 'NULL', 'NULL', 'NULL', 'NULL', 'NULL')
+            insert(jid, repo, 'NULL', queue_wait_time, 'NULL', today, 'NULL', job_state)
         else:
             job_started_at = lines[3].split('T', 1)[1][:-1]
             worker_name = lines[6].split('.', 1)[1]
