@@ -129,6 +129,7 @@ while(build_state != "passed" and build_state != "failed" and build_state != "er
    queue_wait_time = wait_time
 
    if job_state == "queued" and wait_time >= 60:
+      #TODO: Send a request to cancel the build
       print("[LOG]: Job waiting in queue for over an hour.")
       write_failure_log(job_id, 60)
       exit()
@@ -140,7 +141,7 @@ if build_state =="errored":
 
 sleep(180)
 
-print("All jobs have finished")
+print("[LOG]: Build has finished")
 
 write_passed_log(job_id, queue_wait_time)
 
