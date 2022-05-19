@@ -15,14 +15,14 @@ def parse_log_input():
         lines = [line.rstrip() for line in lines]
 
         j1_started_at = lines[3].split('T', 1)[1][:-1]
-        j2_started_at = lines[14].split('T', 1)[1][:-1]
+        j2_started_at = lines[13].split('T', 1)[1][:-1]
 
-        jid = [int(lines[1]), int(lines[12])]
+        jid = [int(lines[1]), int(lines[11])]
 
-        worker_name = [lines[6].split('.', 1)[1], lines[17].split('.', 1)[1]]
+        worker_name = [lines[5].split('.', 1)[1], lines[15].split('.', 1)[1]]
 
-        job1_bootup = lines[9].split(':', 1)[1]
-        job2_bootup = lines[20].split(':', 1)[1]
+        job1_bootup = lines[8].split(':', 1)[1]
+        job2_bootup = lines[18].split(':', 1)[1]
 
         j1_triggered, j2_triggered = 0, 0
 
