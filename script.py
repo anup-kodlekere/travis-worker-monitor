@@ -84,7 +84,7 @@ build_id = response.json()["builds"][0]["id"]
 # wait for the job to finish since sometimes the logs aren't streamed back
 # to travis-ui immediately
 
-print("Waiting for all jobs to finish")
+print("[LOG]: Waiting for all jobs to finish")
 
 orig = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()
 build_state = orig["state"]

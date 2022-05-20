@@ -27,13 +27,6 @@ def insert(ids, rep, wrkr, qwt, bttm, dt, tm, st):
     cursor.execute(query)
     conn.commit()
 
-    #Executing an MYSQL function using the execute() method
-    cursor.execute("select * from lxd_usage_details")
-
-    # Fetch a single row using fetchone() method.
-    data = cursor.fetchall()
-    print(data)
-
     conn.close()
 
     print("[LOG]: DB Connection closed")
