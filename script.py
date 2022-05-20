@@ -1,8 +1,11 @@
+from ast import parse
 import requests
 import json
 from time import sleep
 from datetime import datetime
 import os
+
+from db import parse_log_input
 
 #TODO: Document how to get job.id and repository.id
 # you can find your travis api token in your profile
@@ -36,55 +39,25 @@ body={
 }
 
 def write_passed_log(job_id, job_queue_waiting_time):
-   dep_file = open("deploy_info.log", "a")
-   endpoint = "https://api.travis-ci.com/job/" + str(job_id) + "/log.txt"
-   response = requests.get(endpoint, headers=log_headers)
-   logs = response.text
+
+   endpoint = "https://api.travis-ci.com/job/" + str(job_id) + "/log"
+   content = requests.get(endpoint, headers=headers).json()["content"]
+
+   hostname = content.splitlines()[2:6][0]
+   hostname = hostname.split('.', 1)[1]
+
+   startup_time = content.splitlines()[2:6][3]
+   startup_time = startup_time.split(':', 1)[1]
 
    endpoint = "https://api.travis-ci.com/job/" + str(job_id)
-   response = requests.get(endpoint, headers=headers)
+   job_started_at = requests.get(endpoint, headers=headers).json()["started_at"]
+   job_started_at = job_started_at.split('T', 1)[1]
 
-   job_started_at = response.json()["started_at"]
+   parse_log_input(job_id, hostname, startup_time, job_started_at, job_queue_waiting_time, 'passed')
 
-   dep_file.write("{}".format(job_id))
-   dep_file.write("\n")
-
-   dep_file.write("{}".format(job_queue_waiting_time))
-   dep_file.write("\n")
-
-   dep_file.write("passed")
-   dep_file.write("\n")
-
-   dep_file.write("{}".format(job_started_at))
-   dep_file.write("\n")
-   
-   dep_file.write(logs)
-   dep_file.write("\n")
-
-   # print("[LOG]: {}".format(job_id))
-   # print("[LOG]: {}".format(job_queue_waiting_time))
-   # print("[LOG]: {}".format(job_started_at))
-   # print("[LOG]: passed")
-   # print("[LOG]: {}".format(logs))
-
-   dep_file.close()
 
 def write_failure_log(job_id, job_queue_waiting_time):
-   dep_file = open("deploy_info.log", "a")
-
-   dep_file.write("{}".format(job_id))
-   dep_file.write("\n")
-
-   dep_file.write("{}".format(job_queue_waiting_time))
-   dep_file.write("\n")
-
-   dep_file.write("failed")
-   
-   for _ in range(6):
-      dep_file.write('NULL')
-      dep_file.write('\n')
-
-   dep_file.close()
+   parse_log_input(job_id, 'NULL', 'NULL', 'NULL', 60, 'queued')
 
 build_request_made = datetime.now()
 print("[LOG]: Build request made at {}".format(build_request_made))
