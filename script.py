@@ -57,7 +57,7 @@ def write_passed_log(job_id, job_queue_waiting_time):
 
 
 def write_failure_log(job_id, job_queue_waiting_time):
-   parse_log_input(job_id, 'NULL', 'NULL', 'NULL', 60, 'queued')
+   parse_log_input(job_id, 'NULL', 'NULL', 'NULL', job_queue_waiting_time, 'queued')
 
 build_request_made = datetime.now()
 print("[LOG]: Build request made at {}".format(build_request_made))
