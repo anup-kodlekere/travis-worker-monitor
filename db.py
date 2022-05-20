@@ -40,34 +40,36 @@ def insert(ids, rep, wrkr, qwt, bttm, dt, tm, st):
 
 def parse_log_input():
 
-    with open("raw_db_input") as deploy:
-        lines = deploy.readlines()
-        lines = [line.rstrip() for line in lines]
-        print(lines)
-        jid = int(lines[0])
-        queue_wait_time = int(lines[1])
-        job_state = lines[2]
-        today = date.today()
-        repo = 'anup-kodlekere/travis-sample-job'
+    deploy = open("raw_db_input", "r")
 
-        if job_state == 'queued':
-            insert(jid, repo, 'NULL', queue_wait_time, 'NULL', today, 'NULL', job_state)
+    lines = deploy.readlines()
+    lines = [line.rstrip() for line in lines]
+    print(lines)
+    jid = int(lines[0])
+    queue_wait_time = int(lines[1])
+    job_state = lines[2]
+    today = date.today()
+    repo = 'anup-kodlekere/travis-sample-job'
+
+    if job_state == 'queued':
+        insert(jid, repo, 'NULL', queue_wait_time, 'NULL', today, 'NULL', job_state)
+    else:
+        job_started_at = lines[3].split('T', 1)[1][:-1]
+        worker_name = lines[6].split('.', 1)[1]
+        job_bootup = lines[9].split(':', 1)[1]
+
+        worker_bootup = 0
+        minute_j1 = job_bootup.find('m')
+        if minute_j1 != -1:
+            m = int(job_bootup[1:minute_j1])
+            s = round(float(job_bootup[minute_j1+1:-1]))
+            worker_bootup = m * 60 + s
         else:
-            job_started_at = lines[3].split('T', 1)[1][:-1]
-            worker_name = lines[6].split('.', 1)[1]
-            job_bootup = lines[9].split(':', 1)[1]
+            j1s = round(float(job_bootup[1:-1]))
+            worker_bootup = j1s
 
-            worker_bootup = 0
-            minute_j1 = job_bootup.find('m')
-            if minute_j1 != -1:
-                m = int(job_bootup[1:minute_j1])
-                s = round(float(job_bootup[minute_j1+1:-1]))
-                worker_bootup = m * 60 + s
-            else:
-                j1s = round(float(job_bootup[1:-1]))
-                worker_bootup = j1s
+        insert(jid, repo, worker_name, queue_wait_time, worker_bootup, today, job_started_at, job_state)
 
-            insert(jid, repo, worker_name, queue_wait_time, worker_bootup, today, job_started_at, job_state)
 
     deploy.close()
 
