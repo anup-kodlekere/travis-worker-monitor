@@ -1,11 +1,12 @@
 import psycopg2
+import os
 from datetime import date
 
 def insert(ids, rep, wrkr, qwt, bttm, dt, tm, st):
 
     #establishing the connection
     conn = psycopg2.connect(
-        database="worker_usage", user='postgres', password='76482687', host='169.48.22.246', port='6443'
+        database="worker_usage", user='postgres', password=os.environ['DB_PASS'], host=os.environ['DB_IP'], port='6443'
     )
 
     print("[LOG]: Connected to remote postgres db")
