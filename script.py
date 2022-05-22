@@ -90,6 +90,7 @@ build_state = orig["state"]
 
 job_id = orig["jobs"][0]["id"]
 queue_wait_time = 0 # in minutes
+JOB_TIMEOUT = 30 # in minutes  
 
 
 while(build_state != "passed" and build_state != "failed" and build_state != "errored"):
@@ -105,14 +106,15 @@ while(build_state != "passed" and build_state != "failed" and build_state != "er
 
    wait_time = (qwt_h - request_made_hour) * 60 + (qwt_m - request_made_min)
    queue_wait_time = wait_time
+   print("[LOG] Waiting in queue for {}".format(wait_time))
 
-   if job_state == "queued" and wait_time >= 60:
+   if job_state == "queued" and wait_time >= JOB_TIMEOUT:
       #TODO: Send a request to cancel the build
-      print("[LOG]: Job waiting in queue for over an hour.")
+      print("[LOG]: Job waiting in queue for over 30 minutes. Writing Failure Log")
       sleep(10)
-      write_failure_log(job_id, 60)
+      write_failure_log(job_id, wait_time)
       sleep(10)
-      exit()
+      exit(1)
 
 
 if build_state =="errored":
