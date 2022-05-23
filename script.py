@@ -106,11 +106,10 @@ while(build_state != "passed" and build_state != "failed" and build_state != "er
 
    wait_time = (qwt_h - request_made_hour) * 60 + (qwt_m - request_made_min)
    queue_wait_time = wait_time
-   print("[LOG] Waiting in queue for {}".format(wait_time))
 
    if job_state == "queued" and wait_time >= JOB_TIMEOUT:
       #TODO: Send a request to cancel the build
-      print("[LOG]: Job waiting in queue for over 30 minutes. Writing Failure Log")
+      print("[LOG]: Job waiting in queue for {} minutes. Writing Failure Log".format(wait_time))
       sleep(10)
       write_failure_log(job_id, wait_time)
       sleep(10)
