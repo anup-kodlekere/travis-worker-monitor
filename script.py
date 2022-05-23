@@ -126,7 +126,8 @@ sleep(180)
 print("[LOG]: Build has finished")
 
 write_passed_log(job_id, queue_wait_time)
+exit(0)
 
-build_started_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["started_at"]
-build_finished_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["finished_at"]
-build_duration = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["duration"]
+# build_started_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["started_at"]
+# build_finished_at = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["finished_at"]
+# build_duration = requests.get("https://api.travis-ci.com/build/"+str(build_id), headers=headers).json()["duration"]
