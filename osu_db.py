@@ -43,7 +43,6 @@ def parse(deploy):
     fj = int(lines[6].split(':', 1)[1][1:])
     cj = int(lines[7].split(':', 1)[1][1:])
     ej = int(lines[8].split(':', 1)[1][1:])
-    print(hostname, tj, pj, fj, cj, ej)
 
     usage.close()
 
