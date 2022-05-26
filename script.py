@@ -108,8 +108,8 @@ while(build_state != "passed" and build_state != "failed" and build_state != "er
    queue_wait_time = wait_time
 
    if job_state == "queued" and wait_time >= JOB_TIMEOUT:
-      #TODO: Send a request to cancel the build
-      print("[LOG]: Job waiting in queue for {} minutes. Writing Failure Log".format(wait_time))
+      response = requests.post("https://api.travis-ci.com/" + str(build_id), headers=headers)
+      print("[LOG]: Job waiting in queue for {} minutes. Cancelled Travis Job. Writing Failure Log".format(wait_time))
       sleep(10)
       write_failure_log(job_id, wait_time)
       sleep(10)
