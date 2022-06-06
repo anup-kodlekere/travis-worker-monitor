@@ -6,7 +6,7 @@ def insert(hn, la, lb, tj, pj, fj, cj, ej):
 
     #establishing the connection
     conn = psycopg2.connect(
-        database="worker_usage", user='postgres', password=os.environ['DB_PASS'], host=os.environ['DB_IP'], port='6443'
+        database="worker_usage", user='postgres', password=os.environ['DB_PASS'], host=os.environ['DB_IP'], port=os.environ['DB_PORT']
     )
 
     print("[LOG]: Connected to remote postgres db")
